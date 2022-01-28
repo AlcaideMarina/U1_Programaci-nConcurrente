@@ -1,47 +1,59 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-public class ChatbotClient {
+// Client class
+class Client {
+	
+	// driver code
+	public static void main(String[] args)
+	{
+		// establish a connection by providing host and port
+		// number
+		try (Socket socket = new Socket("localhost", 1234)) {
+			
+			// writing to server
+			PrintWriter out = new PrintWriter(
+				socket.getOutputStream(), true);
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
-		
-		String serverAddress = System.console().readLine("Introduce la dirección IP del servidor.\n");
-		System.out.println("\n");
-		System.out.println("Bienvenido a la Academia Learning\n");
-		System.out.println("Este chatbot está destinado a la resolución de preguntas sobre diversos temas.\n");
-		System.out.println("Le dejamos aquí una lista de dudas frecuentes. "
-				+ "Para más información, le recomendamos que acuda a alguno de nuestros centros o nos llame a los"
-				+ "números de teléfono de nuestra página web.\n");
-		
-		while(true) {
+			// reading from server
+			BufferedReader in
+				= new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
 			
-			String number = System.console().readLine("Introduce el índice de la pregunta.\n");
+			String line = null;
 			
-			// Creamos el socket
-			Socket socket = new Socket(serverAddress, 9999);
-			
-			// Enviar número al servidor
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			out.println(number);
-			
-			// El servidor procesa el número
-			// Recibimos la respuesta del servidor 
-			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String answer = input.readLine();
-			
-			// Imprimimos el mensaje
-			System.out.println(answer);
-			
-			// Cerrar el socket
-			socket.close();
-			
+			//Introducción
+			out.println("Connected");
+			System.out.println(in.readLine() + "\n");
+			System.out.println(in.readLine() + "\n");
+			//Opciones
+			System.out.println(in.readLine());
+			System.out.println(in.readLine());
+			System.out.println(in.readLine());
+			System.out.println(in.readLine());
+			System.out.println(in.readLine());
+			System.out.println(in.readLine());
+			System.out.println("\n");
+
+			while (!"Salir".equalsIgnoreCase(line)) {
+				
+				// reading from user
+				line = System.console().readLine();
+
+				// sending the user input to server
+				out.println(line);
+				out.flush();
+
+				// displaying server reply
+				System.out.println(in.readLine());
+				System.out.println("\n");
+
+			}
 			
 		}
-
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-
 }
