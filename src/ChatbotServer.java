@@ -5,70 +5,51 @@ import java.util.List;
 
 // Server class
 class Server {
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
+
 		ServerSocket server = null;
 
 		try {
 
-			// server is listening on port 1234
-			server = new ServerSocket(1234);
+			server = new ServerSocket(9999);
 			server.setReuseAddress(true);
 
-			// running infinite loop for getting
-			// client request
 			while (true) {
 
-				// socket object to receive incoming client
-				// requests
 				Socket client = server.accept();
+				System.out.println("New client connected" + client.getInetAddress().getHostAddress());
 
-				// Displaying that new client is connected
-				// to server
-				System.out.println("New client connected"
-								+ client.getInetAddress()
-										.getHostAddress());
+				ClientHandler clientSock = new ClientHandler(client);
 
-				// create a new thread object
-				ClientHandler clientSock
-					= new ClientHandler(client);
-
-				// This thread will handle the client
-				// separately
 				new Thread(clientSock).start();
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (server != null) {
 				try {
 					server.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
 
-	// ClientHandler class
 	private static class ClientHandler implements Runnable {
 		private final Socket clientSocket;
 
-		// Constructor
-		public ClientHandler(Socket socket)
-		{
+		public ClientHandler(Socket socket) {
 			this.clientSocket = socket;
 		}
 
-		public void run()
-		{
+		public void run() {
 			PrintWriter out = null;
 			BufferedReader in = null;
+
 			String intro = "Bienvenido a la Academia Learning.";
 			String description = "Este chatbot está destinado a la resolución de preguntas sobre diversos temas. Le dejamos aquí una lista de dudas frecuentes. Para más información, le recomendamos que acuda a alguno de nuestros centros o nos llame a los números de teléfono de nuestra página web. Introduzca el índice de la pregunta o escriba 'Salir' si desea salir de la aplicación";
+
 			List<String> options = new ArrayList<>();
 			options.add("1 - Información sobre la academia.");
 			options.add("2 - Información sobre las clases ofrecidas.");
@@ -76,25 +57,21 @@ class Server {
 			options.add("4 - Información sobre darse de baja y devoluciones.");
 			options.add("5 - Información sobre política de privacidad.");
 			options.add("Salir - Salir de la aplicación.");
-			
+
 			try {
-					
+
 				// get the outputstream of client
-				out = new PrintWriter(
-					clientSocket.getOutputStream(), true);
+				out = new PrintWriter(clientSocket.getOutputStream(), true);
 
 				// get the inputstream of client
-				in = new BufferedReader(
-					new InputStreamReader(
-						clientSocket.getInputStream()));
+				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 				String line;
 				int clientAnswer = 0;
 				while ((line = in.readLine()) != null) {
+
 					if (line.equals("Connected")) {
-						System.out.printf(
-								" Sent from the client: %s\n",
-								line);
+
 						out.println(intro);
 						out.println(description);
 						out.println(options.get(0));
@@ -103,30 +80,39 @@ class Server {
 						out.println(options.get(3));
 						out.println(options.get(4));
 						out.println(options.get(5));
+
 					} else if (line.equals("Salir")) {
 						out.println("¡Hasta pronto!");
-					}
-					else {
+
+					} else {
+
 						if (isNumeric(line)) {
 							clientAnswer = Integer.parseInt(line);
 						}
+
 						if (!isNumeric(line)) {
 							out.println("Es necesario que el dato introducido (" + line + ") sea numérico. "
 									+ "Por favor, introduzca el índice de la opción que le interese (1 - 5).");
+
 						} else if (clientAnswer < 1 || clientAnswer > 5) {
-							out.println("Debe introducir el índice de la opción que le interese, que se encontrará en el rango 1 - 5.");
+							out.println(
+									"Debe introducir el índice de la opción que le interese, que se encontrará en el rango 1 - 5.");
+
 						} else if (clientAnswer == 1) {
 							out.println("INFORMACIÓN SOBRE LA ACADEMIA: "
 									+ "Somos centro oficial examinador de inglés y contamos con la mayor tasa de aprobados.");
+
 						} else if (clientAnswer == 2) {
 							out.println("INFORMACIÓN SOBRE LAS CLASES OFRECIDAS: "
 									+ "En Academia Learning ofrecemos cursos anuales, semestrales e intensivos. "
 									+ "Además, puedes elegir la modalidad presencial u online. "
 									+ "Ten en cuenta que además puedes escoger cursos de  Cambridge, Trinity, Aptis y LanguageCert");
+
 						} else if (clientAnswer == 3) {
-							out.println("INFORMACIÓN SOBRE PRECIOS Y TARIFAS: " 
+							out.println("INFORMACIÓN SOBRE PRECIOS Y TARIFAS: "
 									+ "El precio varía en función del tipo de curso, de si es presencial, del título que hagas. "
 									+ "Te recomendamos que te dirijas a alguno de nuestros centro o que llames al teléfono de atención al cliente.");
+
 						} else if (clientAnswer == 4) {
 							out.println("INFORMACIÓN SOBRE DARSE DE BAJA Y DEVOLUCIONES: "
 									+ "Para cursos online, se pagará todo por adelantado, sin haber posibilidad de devolución del dinero. "
@@ -134,17 +120,16 @@ class Server {
 						} else if (clientAnswer == 5) {
 							out.println("INFORMACIÓN SOBRE POLÍTICA DE PRIVACIDAD: "
 									+ "Le informamos que estas conversaciones pueden ser grabadas con el fin de mejorar la calidad de nuestros servicios.");
+
 						} else {
 							out.println("Se ha producido un error. Por favor, inténtelo más tarde.");
+
 						}
 					}
-					
 				}
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				try {
 					if (out != null) {
 						out.close();
@@ -153,14 +138,13 @@ class Server {
 						in.close();
 						clientSocket.close();
 					}
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-	
+
 	public static boolean isNumeric(String str) {
 		try {
 			Integer.parseInt(str);
@@ -169,5 +153,5 @@ class Server {
 		}
 		return true;
 	}
-	
+
 }
