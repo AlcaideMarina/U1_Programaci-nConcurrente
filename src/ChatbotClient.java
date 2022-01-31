@@ -38,6 +38,7 @@ class Client {
 			}
 
 		} catch (IOException e) {
+			System.out.println("Error en el main - Client: " + e.toString());
 			e.printStackTrace();
 		}
 	}
