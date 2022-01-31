@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 
-class Client {
+class ChatbotClient {
 
 	public static void main(String[] args) {
 
@@ -29,7 +29,7 @@ class Client {
 
 				line = System.console().readLine();
 
-				out.println(line);
+				out.println(line);	
 				out.flush();
 
 				System.out.println(in.readLine());

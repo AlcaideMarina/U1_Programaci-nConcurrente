@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Server class
-class Server {
+class ChatbotServer {
 	
 	public static void main(String[] args) {
 
@@ -13,12 +13,12 @@ class Server {
 		try {
 
 			server = new ServerSocket(9999);
-			server.setReuseAddress(true);
+			
 
 			while (true) {
 
 				Socket client = server.accept();
-				System.out.println("New client connected" + client.getInetAddress().getHostAddress());
+				System.out.println("New client connected: " + client.getInetAddress().getHostAddress());
 
 				ClientHandler clientHandler = new ClientHandler(client);
 
@@ -41,6 +41,7 @@ class Server {
 	}
 
 	private static class ClientHandler implements Runnable {
+		
 		private final Socket clientSocket;
 
 		public ClientHandler(Socket socket) {
@@ -64,10 +65,7 @@ class Server {
 
 			try {
 
-				// get the outputstream of client
 				out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-				// get the inputstream of client
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 				String line;
