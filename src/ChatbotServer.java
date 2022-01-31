@@ -5,6 +5,7 @@ import java.util.List;
 
 // Server class
 class Server {
+	
 	public static void main(String[] args) {
 
 		ServerSocket server = null;
@@ -19,17 +20,20 @@ class Server {
 				Socket client = server.accept();
 				System.out.println("New client connected" + client.getInetAddress().getHostAddress());
 
-				ClientHandler clientSock = new ClientHandler(client);
+				ClientHandler clientHandler = new ClientHandler(client);
 
-				new Thread(clientSock).start();
+				new Thread(clientHandler).start();
 			}
+			
 		} catch (IOException e) {
+			System.out.println("Error en el main (catch) - Server: " + e.toString());
 			e.printStackTrace();
 		} finally {
 			if (server != null) {
 				try {
 					server.close();
 				} catch (IOException e) {
+					System.out.println("Error en el main (finally) - Server: " + e.toString());
 					e.printStackTrace();
 				}
 			}
@@ -128,6 +132,7 @@ class Server {
 					}
 				}
 			} catch (IOException e) {
+				System.out.println("Error en run - ClientHandler: " + e.toString());
 				e.printStackTrace();
 			} finally {
 				try {
@@ -139,6 +144,7 @@ class Server {
 						clientSocket.close();
 					}
 				} catch (IOException e) {
+					System.out.println("Error en run (finally) - ClientHandler: " + e.toString());
 					e.printStackTrace();
 				}
 			}
@@ -146,12 +152,14 @@ class Server {
 	}
 
 	public static boolean isNumeric(String str) {
+		
 		try {
 			Integer.parseInt(str);
 		} catch (NumberFormatException e) {
 			return false;
 		}
 		return true;
+		
 	}
 
 }
